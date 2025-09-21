@@ -8,6 +8,20 @@
       "when": 1758211851071,
       "tag": "0000_talented_raider",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1758299018662,
+      "tag": "0001_young_frog_thor",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1758435485571,
+      "tag": "0002_easy_captain_marvel",
+      "breakpoints": true
     }
   ]
 }
