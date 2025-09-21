@@ -12,6 +12,7 @@ import {
 import { getUserById } from "src/db/queries/users";
 import { Feed, User } from "src/db/schema";
 import { parseDuration } from "src/lib/time";
+import { createPost, getPostsForUsers } from "src/db/queries/posts";
 
 export async function handlerAggregate(cmdName: string, ...args: string[]) {
   if (args.length !== 1) {
@@ -139,6 +140,32 @@ export async function handlerUnfollow(
   console.log(`%s unfollowed successfully!`, feed.name);
 }
 
+export async function handlerBrowse(
+  cmdName: string,
+  user: User,
+  ...args: string[]
+) {
+  let limit = 2;
+  if (args.length === 1) {
+    let specifiedLimit = parseInt(args[0]);
+    if (specifiedLimit) {
+      limit = specifiedLimit;
+    } else {
+      throw new Error(`usage: ${cmdName} [limit]`);
+    }
+  }
+
+  const posts = await getPostsForUsers(user.id, limit);
+  console.log(`Found ${posts.length} posts for user ${user.name}`);
+  for (let post of posts) {
+    console.log(`${post.publishedAt} from ${post.feedName}`);
+    console.log(`--- ${post.title} ---`);
+    console.log(`    ${post.description}`);
+    console.log(`Link: ${post.url}`);
+    console.log(`=====================================`);
+  }
+}
+
 function printFeed(feed: Feed, user: User) {
   console.log(`* ID:            ${feed.id}`);
   console.log(`* Created:       ${feed.createdAt}`);
@@ -166,7 +193,22 @@ async function scrapeFeeds() {
 
 async function scrapeFeed(feed: Feed) {
   await markFeedFetched(feed.id);
+
   const feedData = await fetchFeed(feed.url);
+  for (let item of feedData.channel.item) {
+    console.log(`Found post: %s`, item.title);
+    const now = new Date();
+    await createPost({
+      url: item.link,
+      feedId: feed.id,
+      title: item.title,
+      createdAt: now,
+      updatedAt: now,
+      description: item.description,
+      publishedAt: new Date(item.pubDate),
+    });
+  }
+
   console.log(
     `Feed ${feed.name} collected, ${feedData.channel.item.length} posts found`
   );
