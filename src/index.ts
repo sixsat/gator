@@ -1,4 +1,8 @@
-import { type CommandsRegistry, registerCommand, runCommand } from "./commands";
+import {
+  type CommandsRegistry,
+  registerCommand,
+  runCommand,
+} from "./commands/commands";
 import {
   handlerLogin,
   handlerRegister,
