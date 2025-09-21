@@ -1,4 +1,4 @@
-import { User } from "./db/schema";
+import { User } from "../db/schema";
 
 export type CommandHandler = (
   cmdName: string,
